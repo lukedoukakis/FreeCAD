@@ -156,3 +156,7 @@ int main( int argc, char ** argv )
     return 0;
 }
 
+extern "C" __declspec(dllexport) void main_2(int argc, char** argv) { // from line ~1580
+    std::cout << "baby shark doo doo doo doo doo doo";
+    main(argc, argv);
+}

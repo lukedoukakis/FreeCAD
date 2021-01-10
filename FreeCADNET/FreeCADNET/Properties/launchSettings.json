@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "FreeCADNET": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

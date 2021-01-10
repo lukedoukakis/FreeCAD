@@ -25,6 +25,7 @@
 
 
 #include "PreCompiled.h"
+#include <comdef.h>
 
 #ifndef _PreComp_
 # include <iostream>
@@ -156,6 +157,21 @@ FC_LOG_LEVEL_INIT("App",true,true)
 using namespace Base;
 using namespace App;
 using namespace std;
+
+extern "C" __declspec(dllexport) void Application_init(int argc, char** argv) { // from line ~1580
+    cout << "P/invoking Application::init(int, char**)\n";
+    Application::init(argc, argv);
+}
+
+extern "C" __declspec(dllexport) void Application_run() {
+    cout << "P/invoking Application::runApplication()\n";
+    Application::runApplication();
+}
+
+extern "C" __declspec(dllexport) void Application_closeAllDocuments(void) {
+    cout << "P/invoking App:GetApplication().closeAllDocuments()\n";
+    App:GetApplication().closeAllDocuments();
+}
 
 //==========================================================================
 // Application
@@ -478,10 +494,12 @@ bool Application::closeDocument(const char* name)
 
 void Application::closeAllDocuments(void)
 {
+    cout << "Now running Application::closeAllDocuments()\n";
     Base::FlagToggler<bool> flag(_isClosingAll);
     std::map<std::string,Document*>::iterator pos;
     while((pos = DocMap.begin()) != DocMap.end())
         closeDocument(pos->first.c_str());
+    cout << "Completed Application::closeAllDocuments()\n";
 }
 
 App::Document* Application::getDocument(const char *Name) const
@@ -1579,6 +1597,7 @@ void my_se_translator_filter(unsigned int code, EXCEPTION_POINTERS* pExp)
 
 void Application::init(int argc, char ** argv)
 {
+    cout << "Now running Application::init(int, char**).\n";
     try {
         // install our own new handler
 #ifdef _MSC_VER // Microsoft compiler
@@ -1614,7 +1633,9 @@ void Application::init(int argc, char ** argv)
         destructObserver();
         throw;
     }
+    cout << "Completed Application::init(int, char**).\n";
 }
+
 
 void Application::initTypes(void)
 {
@@ -2002,6 +2023,7 @@ void Application::initApplication(void)
     Base::QuantityFormat::setDefaultDenominator(denom);
 
 
+
 #if defined (_DEBUG)
     Console().Log("Application is built with debug information\n");
 #endif
@@ -2152,9 +2174,10 @@ void Application::processCmdLineFiles(void)
 
 void Application::runApplication()
 {
+    cout << "Now running Application::runApplication()\n";
     // process all files given through command line interface
     processCmdLineFiles();
-
+    
     if (mConfig["RunMode"] == "Cmd") {
         // Run the commandline interface
         Interpreter().runCommandLine("FreeCAD Console mode");
@@ -2171,6 +2194,7 @@ void Application::runApplication()
     else {
         Console().Log("Unknown Run mode (%d) in main()?!?\n\n",mConfig["RunMode"].c_str());
     }
+    cout << "Completed Application::runApplication()\n";
 }
 
 void Application::logStatus()
